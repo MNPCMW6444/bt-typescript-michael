@@ -1,15 +1,18 @@
 import products from "./data/products.json";
-import { Cart, Product } from "./interfaces";
+import { Cart, cartProduct, Product } from "./interfaces";
 
-const addProduct = (cart: Cart, product: Product) => {
-  cart[product.name] = { ...product };
+const addProduct = (
+  cart: Cart,
+  productName: string,
+  productDetails: cartProduct
+) => {
+  cart[productName] = productDetails;
+  //can be immutable
 };
 
-const removeProduct = (cart: Cart, productToRemove: Product) => {
-  Object.keys(cart).filter(
-    (productName) => productName !== productToRemove.name
-  );
-};
+const removeProduct = (cart: Cart, productNameToRemove: string) =>
+  delete cart[productNameToRemove];
+// no need to check if exists - because this won't throw error if isn't
 
 const updateProductAmount = (cart: Cart, productName: string, amount: number) =>
   (amount > 0 && !cart[productName].limit) ||
@@ -21,8 +24,9 @@ const checkout = (cart: Cart) => {
 
 const totalPrice = (cart: Cart): number => {
   const sum = Object.keys(cart).reduce(
-    (previousValue, currentValue) =>
-      previousValue + cart[currentValue].price * cart[currentValue].amount,
+    (previousPrice: number, currentProductName: string) =>
+      previousPrice +
+      cart[currentProductName].price * cart[currentProductName].amount,
     0
   );
   return sum;
@@ -34,4 +38,4 @@ const productQuantity = (cart: Cart) => {
 
 let cart: Cart = {};
 
-products.forEach((product: Product) => addProduct(cart, product));
+products.forEach((product: Product) => addProduct(cart, product.name, product));
