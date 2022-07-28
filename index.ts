@@ -2,41 +2,36 @@ import products from "./data/products.json";
 import { Cart, Product } from "./interfaces";
 
 const addProduct = (cart: Cart, product: Product) => {
-  cart.products.push(product);
+  cart[product.name] = { ...product };
 };
 
 const removeProduct = (cart: Cart, productToRemove: Product) => {
-  cart.products.filter((product) => product.name !== productToRemove.name);
+  Object.keys(cart).filter(
+    (productName) => productName !== productToRemove.name
+  );
 };
 
 const updateProductAmount = (cart: Cart, productName: string, amount: number) =>
-  amount > 0 &&
-  (cart.products = cart.products.map((oldProduct) =>
-    oldProduct.name === productName
-      ? { ...oldProduct, amount: amount }
-      : { ...oldProduct }
-  ));
+  (amount > 0 && !cart[productName].limit) ||
+  (amount <= cart[productName].limit && (cart[productName].amount = amount));
+
 const checkout = (cart: Cart) => {
-  cart.products = [];
+  cart = {};
 };
 
 const totalPrice = (cart: Cart): number => {
-  const sum = cart.products.reduce(
+  const sum = Object.keys(cart).reduce(
     (previousValue, currentValue) =>
-      previousValue + currentValue.price * currentValue.amount,
+      previousValue + cart[currentValue].price * cart[currentValue].amount,
     0
   );
   return sum;
 };
 
 const productQuantity = (cart: Cart) => {
-  const totalAmount = cart.products.reduce(
-    (previousValue, currentValue) => previousValue + currentValue.amount,
-    0
-  );
-  return totalAmount;
+  return Object.keys(cart).length;
 };
 
-let cart: Cart = { products: [] };
+let cart: Cart = {};
 
 products.forEach((product: Product) => addProduct(cart, product));

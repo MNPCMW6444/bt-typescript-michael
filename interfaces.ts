@@ -7,6 +7,10 @@ export interface Product {
   amount: number;
 }
 
-export interface Cart {
-  products: { name: string; price: number; amount: number }[];
+export interface cartProduct {
+  price: number;
+  amount: number;
+  limit?: number;
 }
+
+export type Cart = Record<string, cartProduct>;
