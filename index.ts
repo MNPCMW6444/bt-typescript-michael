@@ -1,11 +1,11 @@
-const products = require("./data/products.json");
+import products from "./data/products.json";
 
 interface Product {
   name: string;
   description: string;
   price: number;
-  image: URL;
-  limit: number;
+  image: string;
+  limit?: number;
   amount: number;
 }
 
@@ -18,28 +18,22 @@ const addProduct = (cart: Cart, product: Product) => {
 };
 
 const removeProduct = (cart: Cart, productToRemove: Product) => {
-  cart.products.forEach((product, i) => {
-    if (product.name === productToRemove.name) cart.products.splice(i, 1);
-  });
+  cart.products.filter((product) => product.name !== productToRemove.name);
 };
 
-const updateProductAmount = (
-  cart: Cart,
-  productToChangeAmount: Product,
-  amount: number
-) => {
-  cart.products.forEach((product, i) => {
-    if (product.name === productToChangeAmount.name) product.amount = amount;
-  });
-};
-
+const updateProductAmount = (cart: Cart, product: Product, amount: number) =>
+  (cart.products = cart.products.map((oldProduct) =>
+    oldProduct.name === product.name
+      ? { ...oldProduct, amount: oldProduct.amount }
+      : { ...oldProduct }
+  ));
 const checkout = (cart: Cart) => {
   cart.products = [];
 };
 
 const totalPrice = (cart: Cart): number => {
   let sum: number = 0;
-  cart.products.forEach((product, i) => {
+  cart.products.forEach((product) => {
     sum += product.amount * product.price;
   });
   return sum;
@@ -51,10 +45,6 @@ const productQuantity = (cart: Cart) => {
 
 let cart: Cart = { products: [] };
 
-const parsedProducts: Product[] = products;
+const parsedProducts: Product[] = products as Product[];
 
-for (let i = 0; i < parsedProducts.length; i++) {
-  addProduct(cart, parsedProducts[i]);
-}
-
-console.log(totalPrice(cart));
+parsedProducts.forEach((product) => addProduct(cart, product));
