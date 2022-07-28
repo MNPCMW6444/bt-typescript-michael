@@ -38,4 +38,12 @@ const productQuantity = (cart: Cart) => {
 
 let cart: Cart = {};
 
-products.forEach((product: Product) => addProduct(cart, product.name, product));
+products.forEach((product: Product) =>
+  addProduct(cart, product.name, {
+    price: product.price,
+    amount: product.amount,
+    limit: product.limit,
+  })
+);
+
+console.log(totalPrice(cart));
