@@ -1,17 +1,5 @@
 import products from "./data/products.json";
-
-interface Product {
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  limit?: number;
-  amount: number;
-}
-
-interface Cart {
-  products: Product[];
-}
+import { Cart, Product } from "./interfaces";
 
 const addProduct = (cart: Cart, product: Product) => {
   cart.products.push(product);
@@ -21,10 +9,11 @@ const removeProduct = (cart: Cart, productToRemove: Product) => {
   cart.products.filter((product) => product.name !== productToRemove.name);
 };
 
-const updateProductAmount = (cart: Cart, product: Product, amount: number) =>
+const updateProductAmount = (cart: Cart, productName: string, amount: number) =>
+  amount > 0 &&
   (cart.products = cart.products.map((oldProduct) =>
-    oldProduct.name === product.name
-      ? { ...oldProduct, amount: oldProduct.amount }
+    oldProduct.name === productName
+      ? { ...oldProduct, amount: amount }
       : { ...oldProduct }
   ));
 const checkout = (cart: Cart) => {
@@ -32,19 +21,22 @@ const checkout = (cart: Cart) => {
 };
 
 const totalPrice = (cart: Cart): number => {
-  let sum: number = 0;
-  cart.products.forEach((product) => {
-    sum += product.amount * product.price;
-  });
+  const sum = cart.products.reduce(
+    (previousValue, currentValue) =>
+      previousValue + currentValue.price * currentValue.amount,
+    0
+  );
   return sum;
 };
 
 const productQuantity = (cart: Cart) => {
-  return cart.products.length;
+  const totalAmount = cart.products.reduce(
+    (previousValue, currentValue) => previousValue + currentValue.amount,
+    0
+  );
+  return totalAmount;
 };
 
 let cart: Cart = { products: [] };
 
-const parsedProducts: Product[] = products as Product[];
-
-parsedProducts.forEach((product) => addProduct(cart, product));
+products.forEach((product: Product) => addProduct(cart, product));
