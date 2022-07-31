@@ -1,22 +1,28 @@
 import products from "./data/products.json";
-import { Cart, cartProduct, Product } from "./interfaces";
+import { Cart, cartProduct, Product } from "./index.d";
+//todo return types
 
 const addProduct = (
   cart: Cart,
   productName: string,
   productDetails: cartProduct
-) => {
+): void => {
   cart[productName] = productDetails;
-  //can be immutable
 };
 
-const removeProduct = (cart: Cart, productNameToRemove: string) =>
+const removeProduct = (cart: Cart, productNameToRemove: string): void => {
   delete cart[productNameToRemove];
-// no need to check if exists - because this won't throw error if isn't
+}; // no need to check if exists - because this won't throw error if isn't
 
-const updateProductAmount = (cart: Cart, productName: string, amount: number) =>
-  (amount > 0 && !cart[productName].limit) ||
-  (amount <= cart[productName].limit && (cart[productName].amount = amount));
+const updateProductAmount = (
+  cart: Cart,
+  productName: string,
+  amount: number
+): void => {
+  amount > 0 &&
+    (!cart[productName].limit || amount <= cart[productName].limit) &&
+    (cart[productName].amount = amount);
+};
 
 const checkout = (cart: Cart) => {
   cart = {};
@@ -32,7 +38,7 @@ const totalPrice = (cart: Cart): number => {
   return sum;
 };
 
-const productQuantity = (cart: Cart) => {
+const productQuantity = (cart: Cart): number => {
   return Object.keys(cart).length;
 };
 

@@ -1,10 +1,7 @@
-export interface Product {
+export interface Product extends cartProduct {
   name: string;
   description: string;
-  price: number;
   image: string;
-  limit?: number;
-  amount: number;
 }
 
 export interface cartProduct {
