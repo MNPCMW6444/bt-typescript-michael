@@ -1,20 +1,21 @@
 import products from "./data/products.json";
 import { Product } from "./interfaces";
-import { from } from "rxjs";
+import { from, Subject } from "rxjs";
 
-let cart = from(products);
+let cart = new Subject();
 
-const addProduct = (product: Product) => products.push(product as any);
+const addProduct = (product: Product) => cart.next(product);
 
-const removeProduct = (product: Product) =>
+/* const removeProduct = (product: Product) =>
   products.filter((prdct) => prdct.name !== product.name);
+ */
 
 const updateProductAmount = (product: Product, newAmount: number) =>
   products.forEach((prdct) => {
     if (prdct.name === product.name) prdct.amount = newAmount;
   });
 
-const checkout = () => (cart = from([]));
+const checkout = () => (cart = new Subject());
 
 const totalPrice = () =>
   products.reduce(
