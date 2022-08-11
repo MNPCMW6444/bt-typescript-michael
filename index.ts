@@ -1,28 +1,34 @@
 import products from "./data/products.json";
 import { Cart, cartProduct, Product } from "./interfaces";
+import Rxjs, { Observable } from "rxjs";
 
-const addProduct = (
+/* const addProduct = (
   cart: Cart,
   productName: string,
   productDetails: cartProduct
 ) => {
   cart[productName] = productDetails;
   //can be immutable
-};
+}; */
 
-const removeProduct = (cart: Cart, productNameToRemove: string) =>
-  delete cart[productNameToRemove];
-// no need to check if exists - because this won't throw error if isn't
+const removeProduct = (
+  cart: Observable<Product>,
+  productNameToRemove: string
+) => delete cart[productNameToRemove];
 
-const updateProductAmount = (cart: Cart, productName: string, amount: number) =>
+const updateProductAmount = (
+  cart: Observable<Product>,
+  productName: string,
+  amount: number
+) =>
   (amount > 0 && !cart[productName].limit) ||
   (amount <= cart[productName].limit && (cart[productName].amount = amount));
 
-const checkout = (cart: Cart) => {
+/* const checkout = (cart: Observable<Product>) => {
   cart = {};
-};
+}; */
 
-const totalPrice = (cart: Cart): number => {
+const totalPrice = (cart: Observable<Product>): number => {
   const sum = Object.keys(cart).reduce(
     (previousPrice: number, currentProductName: string) =>
       previousPrice +
@@ -32,18 +38,12 @@ const totalPrice = (cart: Cart): number => {
   return sum;
 };
 
-const productQuantity = (cart: Cart) => {
+const productQuantity = (cart: Observable<Product>) => {
   return Object.keys(cart).length;
 };
 
-let cart: Cart = {};
-
-products.forEach((product: Product) =>
-  addProduct(cart, product.name, {
-    price: product.price,
-    amount: product.amount,
-    limit: product.limit,
-  })
-);
+let cart = new Rxjs.Observable((observer) => {
+  products.forEach((product: Product) => observer.next(product));
+});
 
 console.log(totalPrice(cart));
