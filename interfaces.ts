@@ -1,3 +1,5 @@
+import { BehaviorSubject } from "rxjs/internal/BehaviorSubject";
+
 export interface Product {
   name: string;
   description: string;
@@ -8,9 +10,10 @@ export interface Product {
 }
 
 export interface CartProduct {
+  name: string;
   price: number;
   amount: number;
   limit?: number;
 }
 
-export type Cart = Record<string, CartProduct>;
+export type Cart = BehaviorSubject<CartProduct[]>;

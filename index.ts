@@ -1,75 +1,47 @@
-import products from "./data/products.json";
+import productsArray from "./data/products.json";
 import { Product, Cart, CartProduct } from "./interfaces";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, of } from "rxjs";
 
-const iaddProduct = (
-  iCart: Cart,
-  productName: string,
-  productDetails: CartProduct
-) => {
-  iCart[productName] = productDetails;
-};
+const products = of(productsArray);
 
-const iremoveProduct = (iCart: Cart, productNameToRemove: string) =>
-  delete iCart[productNameToRemove];
-
-const iupdateProductAmount = (
-  iCart: Cart,
-  productName: string,
-  amount: number
-) =>
-  (amount > 0 && !iCart[productName].limit) ||
-  (amount <= iCart[productName].limit && (iCart[productName].amount = amount));
-
-const itotalPrice = (iCart: Cart): number => {
-  const sum = Object.keys(iCart).reduce(
-    (previousPrice: number, currentProductName: string) =>
-      previousPrice +
-      iCart[currentProductName].price * iCart[currentProductName].amount,
-    0
-  );
-  return sum;
-};
-
-const iproductQuantity = (iCart: Cart) => {
-  return Object.keys(iCart).length;
-};
-
-let iCart: Cart = {};
-
-products.forEach((product: Product) =>
-  iaddProduct(iCart, product.name, {
-    price: product.price,
-    amount: product.amount,
-    limit: product.limit,
-  })
-);
-
-const cart = new BehaviorSubject(iCart);
+const cart: Cart = new BehaviorSubject([]);
 
 const addProduct = (product: Product): void => {
-  let oldCart: Cart = cart.getValue();
-  iaddProduct(oldCart, product.name, {
+  let tempCart = cart.getValue();
+  tempCart.push({
+    name: product.name,
     price: product.price,
     amount: product.amount,
   });
-  cart.next(oldCart);
+  cart.next(tempCart);
 };
 
-const removeProduct = (product: Product): void => {
-  let oldCart: Cart = cart.getValue();
-  iremoveProduct(oldCart, product.name);
-  cart.next(oldCart);
+const removeProduct = (name: String): void => {
+  let tempCart = cart.getValue();
+  tempCart.filter((cartProduct: CartProduct) => cartProduct.name !== name);
+  cart.next(tempCart);
 };
 
-const updateProductAmount = (productName: string, amount: number): void => {
-  let oldCart: Cart = cart.getValue();
-  iupdateProductAmount(oldCart, productName, amount);
-  cart.next(oldCart);
+const updateProductAmount = (name: String, newAmount: number): void => {
+  let tempCart = cart.getValue();
+  tempCart.find((cartProduct) => cartProduct.name === name).amount = newAmount;
+  cart.next(tempCart);
 };
 
-const checkout = (): void => cart.next({});
+const checkout = (): void => cart.next([]);
 
-const totalPrice = (): number => itotalPrice(cart.getValue());
+const totalPrice$ = (): BehaviorSubject<number> => {
+  let totalPrice = 0;
+  cart.getValue().forEach((cartProduct) => {
+    totalPrice += cartProduct.amount * cartProduct.price;
+  });
+  return new BehaviorSubject(totalPrice);
+};
 
-const productQuantity = (): number => iproductQuantity(cart.getValue());
+const productQuantity$ = (): BehaviorSubject<number> => {
+  let totalAmount = 0;
+  cart.getValue().forEach((cartProduct) => {
+    totalAmount += cartProduct.amount;
+  });
+  return new BehaviorSubject(totalAmount);
+};
