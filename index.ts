@@ -30,7 +30,7 @@ const totalPrice$ = (): Observable<number> => {
   let totalPrice = 0;
   Object.keys(cart.getValue()).forEach((name) => {
     products.subscribe(
-      (array) =>
+      (array: Product[]) =>
         (totalPrice +=
           array.find((product) => product.name === name).amount *
           array.find((product) => product.name === name).price)
@@ -43,7 +43,7 @@ const productQuantity$ = (): Observable<number> => {
   let totalPrice = 0;
   Object.keys(cart.getValue()).forEach((name) => {
     products.subscribe(
-      (array) =>
+      (array: Product[]) =>
         (totalPrice += array.find((product) => product.name === name).amount)
     );
   });
