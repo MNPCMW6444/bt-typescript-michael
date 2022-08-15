@@ -1,50 +1,51 @@
 import productsArray from "./data/products.json";
-import { Product, Cart, CartProduct } from "./interfaces";
-import { BehaviorSubject, of } from "rxjs";
+import { Product } from "./interfaces";
+import { BehaviorSubject, Observable, of } from "rxjs";
 
 const products = of(productsArray);
-//make it record
-const cart = new BehaviorSubject<CartProduct[]>([]);
-//refactor all funcitons based on the new interface
-const addProduct = (product: Product): void => {
-  let tempCart = cart.getValue();
-  // use spread operator, you don't have to save in 'tempCart'
-  tempCart.push({
-    name: product.name,
-    price: product.price,
-    amount: product.amount,
+
+const cart = new BehaviorSubject<Record<string, number>>({});
+
+const addProduct = (name: string): void =>
+  cart.next({
+    ...cart.getValue(),
+    [name]: 1,
   });
-  cart.next(tempCart);
-};
 
-const removeProduct = (name: String): void => {
+const removeProduct = (name: string): void => {
   let tempCart = cart.getValue();
-  //use delete instead of filter
-  tempCart.filter((cartProduct: CartProduct) => cartProduct.name !== name);
+  delete tempCart[name];
   cart.next(tempCart);
 };
 
-const updateProductAmount = (name: String, newAmount: number): void => {
+const updateProductAmount = (name: string, newAmount: number): void => {
   let tempCart = cart.getValue();
-  tempCart.find((cartProduct) => cartProduct.name === name).amount = newAmount;
+  tempCart[name] = newAmount;
   cart.next(tempCart);
 };
 
-const checkout = (): void => cart.next([]);
-//return observable, use operators - dont create new Observable/behaviorSubject
-const totalPrice$ = (): BehaviorSubject<number> => {
+const checkout = (): void => cart.next({});
+
+const totalPrice$ = (): Observable<number> => {
   let totalPrice = 0;
-  cart.getValue().forEach((cartProduct) => {
-    totalPrice += cartProduct.amount * cartProduct.price;
+  Object.keys(cart.getValue()).forEach((name) => {
+    products.subscribe(
+      (array) =>
+        (totalPrice +=
+          array.find((product) => product.name === name).amount *
+          array.find((product) => product.name === name).price)
+    );
   });
-  return new BehaviorSubject(totalPrice);
+  return new Observable((observer) => observer.next(totalPrice));
 };
-//returns observable
-const productQuantity$ = (): BehaviorSubject<number> => {
-  //use reduce
-  let totalAmount = 0;
-  cart.getValue().forEach((cartProduct) => {
-    totalAmount += cartProduct.amount;
+
+const productQuantity$ = (): Observable<number> => {
+  let totalPrice = 0;
+  Object.keys(cart.getValue()).forEach((name) => {
+    products.subscribe(
+      (array) =>
+        (totalPrice += array.find((product) => product.name === name).amount)
+    );
   });
-  return new BehaviorSubject(totalAmount);
+  return new Observable((observer) => observer.next(totalPrice));
 };
