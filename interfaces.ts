@@ -7,10 +7,10 @@ export interface Product {
   amount: number;
 }
 
-export interface cartProduct {
+export interface CartProduct {
   price: number;
   amount: number;
   limit?: number;
 }
 
-export type Cart = Record<string, cartProduct>;
+export type Cart = Record<string, CartProduct>;
