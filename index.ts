@@ -21,10 +21,6 @@ const iupdateProductAmount = (
   (amount > 0 && !iCart[productName].limit) ||
   (amount <= iCart[productName].limit && (iCart[productName].amount = amount));
 
-const icheckout = (iCart: Cart) => {
-  iCart = {};
-};
-
 const itotalPrice = (iCart: Cart): number => {
   const sum = Object.keys(iCart).reduce(
     (previousPrice: number, currentProductName: string) =>
