@@ -18,6 +18,7 @@ const removeProduct = (name: string): void => {
   cart.next(tempCart);
 };
 
+// add check in the product observable
 const updateProductAmount = (name: string, newAmount: number): void => {
   let tempCart = cart.getValue();
   tempCart[name] = newAmount;
@@ -26,6 +27,7 @@ const updateProductAmount = (name: string, newAmount: number): void => {
 
 const checkout = (): void => cart.next({});
 
+//use rxjs  - combineLatest/withLatestfrom /switchMap
 const totalPrice$ = (): Observable<number> => {
   let totalPrice = 0;
   Object.keys(cart.getValue()).forEach((name) => {
@@ -39,6 +41,7 @@ const totalPrice$ = (): Observable<number> => {
   return new Observable((observer) => observer.next(totalPrice));
 };
 
+//use rxjs, return only amount of keys in cart
 const productQuantity$ = (): Observable<number> => {
   let totalPrice = 0;
   Object.keys(cart.getValue()).forEach((name) => {
