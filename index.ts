@@ -3,11 +3,12 @@ import { Product, Cart, CartProduct } from "./interfaces";
 import { BehaviorSubject, of } from "rxjs";
 
 const products = of(productsArray);
-
-const cart: Cart = new BehaviorSubject([]);
-
+//make it record
+const cart = new BehaviorSubject<CartProduct[]>([]);
+//refactor all funcitons based on the new interface
 const addProduct = (product: Product): void => {
   let tempCart = cart.getValue();
+  // use spread operator, you don't have to save in 'tempCart'
   tempCart.push({
     name: product.name,
     price: product.price,
@@ -18,6 +19,7 @@ const addProduct = (product: Product): void => {
 
 const removeProduct = (name: String): void => {
   let tempCart = cart.getValue();
+  //use delete instead of filter
   tempCart.filter((cartProduct: CartProduct) => cartProduct.name !== name);
   cart.next(tempCart);
 };
@@ -29,7 +31,7 @@ const updateProductAmount = (name: String, newAmount: number): void => {
 };
 
 const checkout = (): void => cart.next([]);
-
+//return observable, use operators - dont create new Observable/behaviorSubject
 const totalPrice$ = (): BehaviorSubject<number> => {
   let totalPrice = 0;
   cart.getValue().forEach((cartProduct) => {
@@ -37,8 +39,9 @@ const totalPrice$ = (): BehaviorSubject<number> => {
   });
   return new BehaviorSubject(totalPrice);
 };
-
+//returns observable
 const productQuantity$ = (): BehaviorSubject<number> => {
+  //use reduce
   let totalAmount = 0;
   cart.getValue().forEach((cartProduct) => {
     totalAmount += cartProduct.amount;

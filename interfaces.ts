@@ -9,6 +9,7 @@ export interface Product {
   amount: number;
 }
 
+//remove price and limit. If you need to find them, search in the products observable
 export interface CartProduct {
   name: string;
   price: number;
