@@ -1,9 +1,12 @@
 import productsArray from "./data/products.json";
 import { Product } from "./interfaces";
-import { BehaviorSubject, Observable, of, combineLatest, pipe } from "rxjs";
-import { map, filter } from "rxjs/operators";
-
-import { create } from "ts-node";
+import {
+  BehaviorSubject,
+  Observable,
+  of,
+  combineLatest,
+  switchMap,
+} from "rxjs";
 
 const productsDB = of(productsArray);
 
@@ -47,17 +50,7 @@ const totalPrice$ = (): Observable<number> => {
 
 //use rxjs, return only amount of keys in cart
 const productQuantity$ = (): Observable<number> =>
-  //cart.pipe(map((cartProducts): number => Object.keys(cartProducts).length));
-
-  cart.pipe(
-    map((cartProducts): number => {
-      let sum = 0;
-      Object.values(cartProducts).forEach((amount) => {
-        sum += amount;
-      });
-      return sum;
-    })
-  );
+  cart.pipe(switchMap((cartProducts) => of(Object.keys(cartProducts).length)));
 
 //totalPrice$().subscribe((value) => console.log(value));
 productQuantity$().subscribe((value) => console.log(value));
