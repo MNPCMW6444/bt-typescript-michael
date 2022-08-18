@@ -1,8 +1,8 @@
 import productsArray from "./data/products.json";
 import { Product } from "./interfaces";
-import { BehaviorSubject, Observable, of, switchMap, map } from "rxjs";
+import { BehaviorSubject, Observable, of, combineLatest, reduce } from "rxjs";
 
-const products = of(productsArray);
+const productsDB = of(productsArray);
 
 const cart = new BehaviorSubject<Record<string, number>>({});
 
@@ -20,7 +20,7 @@ const removeProduct = (name: string): void => {
 
 const updateProductAmount = (name: string, newAmount: number): void => {
   let tempCart = cart.getValue();
-  products.subscribe((array: Product[]) => {
+  productsDB.subscribe((array: Product[]) => {
     if (newAmount <= array.find((product) => product.name === name).limit)
       tempCart[name] = newAmount;
   });
@@ -30,29 +30,7 @@ const updateProductAmount = (name: string, newAmount: number): void => {
 const checkout = (): void => cart.next({});
 
 //use rxjs  - combineLatest/withLatestfrom /switchMap
-const totalPrice$ = (): Observable<number> =>
-  products
-    .pipe(
-      switchMap((productDB) =>
-        cart.pipe(
-          map(
-            (cartAmount) =>
-              cartAmount *
-              productDB.find((prdct) => prdct.name === productDB.name)
-          )
-        )
-      )
-    )
-    .subscribe();
+const totalPrice$ = (): any => {};
 
 //use rxjs, return only amount of keys in cart
-const productQuantity$ = (): Observable<number> => {
-  let totalPrice = 0;
-  Object.keys(cart.getValue()).forEach((name) => {
-    products.subscribe(
-      (array: Product[]) =>
-        (totalPrice += array.find((product) => product.name === name).amount)
-    );
-  });
-  return new Observable((observer) => observer.next(totalPrice));
-};
+const productQuantity$ = (): Observable<number> => {};
