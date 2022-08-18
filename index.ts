@@ -30,7 +30,7 @@ const updateProductAmount = (name: string, newAmount: number): void => {
 const checkout = (): void => cart.next({});
 
 //use rxjs  - combineLatest/withLatestfrom /switchMap
-const totalPrice$ = (): any => {};
+const totalPrice$ = (): Observable<number> => {};
 
 //use rxjs, return only amount of keys in cart
 const productQuantity$ = (): Observable<number> => {};
